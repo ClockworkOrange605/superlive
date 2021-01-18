@@ -1,8 +1,7 @@
-const Database = require("@replit/database")
 const WebSocket = require('ws');
 
-const { v4: uuidv4 } = require('uuid');
 const atob = require('atob');
+const { v4: uuidv4 } = require('uuid');
 
 const config = {
   url: "wss://production.nbaplus.tk:8000/ws",
@@ -10,16 +9,13 @@ const config = {
 }
 
 const eventTypes = ['goal', 'goal-kick', 'offside', 'corner-kick', 'free-kick', 'throw-in']
-const betTypes = ['free-kick', 'goal-kick', 'offside', '!goal', 'corner-kick|free-kick', 
-    'corner-kick|goal|throw-in',  'corner-kick', 'goal|goal-kick', 'goal', 'offside|throw-in', 
-    '!free-kick', 'throw-in', 'free-kick|goal-kick|offside', '!throw-in']
+const betTypes = ['free-kick', 'goal-kick', 'offside', '!goal', 'corner-kick|free-kick', 'corner-kick|goal|throw-in', 'corner-kick', 'goal|goal-kick', 'goal', 'offside|throw-in', '!free-kick', 'throw-in', 'free-kick|goal-kick|offside', '!throw-in']
 
 const state = {}
 
 const ws = new WebSocket(config.url)
-const db = new Database()
 
-ws.on('open', function open() {    
+ws.on('open', function open() {
   ws.send(
     JSON.stringify(
       {
@@ -36,7 +32,7 @@ ws.on('open', function open() {
 ws.on('message', function read(data) {
   let message = JSON.parse(data)
 
-  switch(message.type) {
+  switch (message.type) {
     case 'session-info':
       state.session = message.payload.session
       state.betting = !message.payload.betstop
@@ -44,7 +40,7 @@ ws.on('message', function read(data) {
 
     case 'auth':
       state.auth = message.payload.result
-      
+
       ws.send(
         JSON.stringify(
           {
@@ -63,7 +59,7 @@ ws.on('message', function read(data) {
               filters: {
                 match_state: "all",
                 sport_ids: ["soccer"]
-              },              
+              },
               offset: 0,
               limit: 100
             },
@@ -83,7 +79,7 @@ ws.on('message', function read(data) {
     case 'list-matches-v2':
       state.match = {}
       state.match.id = message.payload.matches[0].id
-      
+
       ws.send(
         JSON.stringify(
           {
@@ -98,7 +94,7 @@ ws.on('message', function read(data) {
       break
 
     case 'subscribe-match':
-      state.markets = message.payload[state.match.id]
+      state.markets = message.payload[state.match.id].markets
 
       console.log(message.payload[state.match.id].teams)
       console.log(message.payload[state.match.id].state)
@@ -113,62 +109,39 @@ ws.on('message', function read(data) {
       state.betting = !message.payload[state.match.id].betstop
 
       let events = message.payload[state.match.id].events
-      let markets = message.payload[state.match.id].events 
+      let markets = message.payload[state.match.id].markets
 
-      if(markets != undefined) {
+      if (markets != undefined) {
         state.match.markets = markets
       }
 
-      if(events != undefined) {
+      if (events != undefined) {
         let eventIndex = Object.keys(events).find(
           index => eventTypes.includes(events[index].type)
         )
 
-        if(eventIndex != undefined) {
+        if (eventIndex != undefined) {
           console.log(events[eventIndex].name)
 
-          if(events[eventIndex].type == 'goal') {}
+          if (events[eventIndex].type == 'goal') { }
 
-          if(events[eventIndex].type == 'offside') {}
+          if (events[eventIndex].type == 'offside') { }
 
-          if(events[eventIndex].type == 'corner-kick') {}
+          if (events[eventIndex].type == 'corner-kick') { }
 
-          if(events[eventIndex].type == 'goal-kick') {}
+          if (events[eventIndex].type == 'goal-kick') { }
 
-          if(events[eventIndex].type == 'free-kick') {
-            let marketId = Object.keys(state.markets).find(
-              index => state.markets[index].type == 'goal-kick'
-            )
-
-            console.log(
-              state.markets[marketId],
-              state.match.markets[marketId],
-              state.match.markets[marketId].price
-            )
-
-            ws.send(
-              JSON.stringify(
-                {
-                  type: 'make-bet',
-                  payload: {
-                    match_id: state.match.id,
-                    market: {
-                      id: marketId,
-                      type: 'goal-kick',
-                      price: state.match.markets[marketId].price,
-                    },
-                    amount: 1000,
-                    allow_price_change: true,
-                    is_auto_bet: false,
-                    is_max_bet: false,
-                  },
-                  rid: uuidv4()
-                }
-              )
-            )
+          if (events[eventIndex].type == 'free-kick') {
+            makeBet('free-kick', 100)
+            makeBet('goal-kick', 100)
           }
 
-          if(events[eventIndex].type == 'throw-in') {}
+          if (events[eventIndex].type == 'throw-in') { 
+            makeBet('throw-in', 100)
+          }
+
+          state.events = {}
+          state.events.push(events[eventIndex])
         }
       }
       break
@@ -188,3 +161,35 @@ ws.on('message', function read(data) {
 ws.on('close', function close() {
   console.log('disconeted')
 })
+
+function makeBet(betType, amount) {
+  let marketId = Object.keys(state.markets).find(
+    index => state.markets[index].type == betType
+  )
+
+  console.log(
+    state.markets[marketId].type,
+    state.match.markets[marketId].price
+  )
+
+  // ws.send(
+  //   JSON.stringify(
+  //     {
+  //       type: 'make-bet',
+  //       payload: {
+  //         match_id: state.match.id,
+  //         market: {
+  //           id: marketId,
+  //           type: state.markets[marketId].type,
+  //           price: state.match.markets[marketId].price,
+  //         },
+  //         amount: 100,
+  //         allow_price_change: true,
+  //         is_auto_bet: false,
+  //         is_max_bet: false,
+  //       },
+  //       rid: uuidv4()
+  //     }
+  //   )
+  // )
+}
