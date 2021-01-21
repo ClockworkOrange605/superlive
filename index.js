@@ -5,17 +5,30 @@ const { v4: uuidv4 } = require('uuid');
 
 const config = {
   url: "wss://production.nbaplus.tk:8000/ws",
-  token: "eyJwcm90ZWN0ZWQiOiJleUpoYkdjaU9pSkZRMFJJTFVWVEswRXlOVFpMVnlJc0ltVnVZeUk2SWtFeU5UWkhRMDBpTENKbGNHc2lPbnNpYTNSNUlqb2lSVU1pTENKamNuWWlPaUpRTFRNNE5DSXNJbmdpT2lKWWQzTm1ORWhyU2psVmEwNWlXa3h4YlRZMlRUQkxTV1prTkZjMlp6QkhURmRUZWtVNVFXbzVTM0JzV0RRMFNVOUJjVVIwV1c1VVMxVkVWaTFyT1ZsTklpd2llU0k2SWpKV1lsQnhUblZ3T1dKUGJITldNa281YjJwNVVtWm9iSFZXUTBkd1VtODNSalZaYmxrMldrbEpkbXB5U1ZWcGN6WkNUMkpNYW00MlZVTlRUbUpaTVZBaWZYMCIsInJlY2lwaWVudHMiOlt7ImVuY3J5cHRlZF9rZXkiOiJOb0NfTi1TY2c4VU9waG5zanJXNnNtSXhXZDBSSmc1X2t5SkQyNGZDNmNUNFVweVAtU0dZRlEifV0sImFhZCI6ImV5SndiR0YwWm05eWJWOXBaQ0k2SW1KcGJtZHZZbTl2YlNJc0luVnpaWEpmZEc5clpXNGlPaUptWTJNME4yVTFNQzFqTURZeExUUXdaR1l0WVdVeU5TMWhNMkl5WldRMk9UUm1OakVpZlEiLCJpdiI6IldWY0dVSWJHOVBwY3VnVHMiLCJjaXBoZXJ0ZXh0IjoiTC1XNWxQZEJGLUhiSV9BY0xJY0RlalJUUkZFY2JyTldIVm9NaWkweU1GZC1RTkpOTEgxMnhhNFlDM0N1QmNMQk5UUFM1d2E4Y19zVHF5b1ZzZWdGWjNZaFBfUDBuakZoUHFvalZSVTAxR25MeDN3YXJEa004UXY4Q3p0VklndVotS3ZFTXB6bjlOTktaLXhMNXZ2YXh2dmMxVkRjSFBwZExrT3RlbHZFTS1xRzEwXy0zNG84MGZ5THlHS1U0WlVxeWR0cVBRIiwidGFnIjoiMU4wSTFMQ19hUWFNZ1h3enFEN1lQdyJ9"
+  token: 
+  "eyJwcm90ZWN0ZWQiOiJleUpoYkdjaU9pSkZRMFJJTFVWVEswRXlOVFpMVnlJc0ltVnVZeUk2SWtFeU5UWkhRMDBpTENKbGNHc2lPbnNpYTNSNUlqb2lSVU1pTENKamNuWWlPaUpRTFRNNE5DSXNJbmdpT2lKeExUTmZlWGR4Y0dab1JsRmFjMkZDVUhkSlJ6TkJRelpUYjFKWVpsbFVkMW8xWWxjNWEwbFBhRWQyWkdFeFNYZEVSSEI2VFZSc1RrUm1kRE5PY2pWTElpd2llU0k2SWs5VmJYaGhjbWh5TFRSdWRIVlBNbkozTFhCM1p6TklVUzFRYkhsTmMzUnFOUzEzZEc4MVVXTklSbGhMUjA5WFoyVmFWbU5vZVZOa1V6Z3hWVTVGV1dnaWZYMCIsInJlY2lwaWVudHMiOlt7ImVuY3J5cHRlZF9rZXkiOiJXc3dXZWU5ZHBEQnpwWXhYUVpKRF9GSkNEQmpfaUVVZ0VkcUo1dTVteFhxS1hjamwtWUh3bHcifV0sImFhZCI6ImV5SndiR0YwWm05eWJWOXBaQ0k2SW1KcGJtZHZZbTl2YlNJc0luVnpaWEpmZEc5clpXNGlPaUkxTmpCak4yTXlOaTA1TWpCakxUUTROV1V0T1dSaVpTMWhaak14TXpNeU1XRTRNR0VpZlEiLCJpdiI6Im5CN1o4NWxLaEoyOWxPc04iLCJjaXBoZXJ0ZXh0IjoiZzhMeTdlR0owY3RaZVdJa3hfQ29sY3FSZ3k4T2ZaVVdpYlFhYVUwRXZ3Z2sxOFlPdW1jaG1Ja1RVX3JiSnFkVFgtU00wWVRZX0R6UHc0am9VTVZNWDJxQ3J4eUlMNmtDYnhkQ2ljMTVEWG9aWFZDd19nVjRWanEzSnRZYUlXTjAwbmdvU3BFUFh6Q1JSUW5oaGh2NGp3cWpMeDRsTFFzY3ZNX0JaaTVCMjRtWkxqWDBGMGt0bjJVTEZITmdfVmUyN0JVRUt3IiwidGFnIjoibjNGSzJYSUVSTnN2TDZwVVUyTlc1USJ9=="
 }
 
 const eventTypes = ['goal', 'goal-kick', 'offside', 'corner-kick', 'free-kick', 'throw-in']
 const betTypes = ['free-kick', 'goal-kick', 'offside', '!goal', 'corner-kick|free-kick', 'corner-kick|goal|throw-in', 'corner-kick', 'goal|goal-kick', 'goal', 'offside|throw-in', '!free-kick', 'throw-in', 'free-kick|goal-kick|offside', '!throw-in']
 
 const state = {}
+const betting = {}
+betting.profit = 0
 
 const ws = new WebSocket(config.url)
 
 ws.on('open', function open() {
+  console.log(JSON.stringify(
+      {
+        type: 'auth',
+        payload: JSON.parse(
+          atob(config.token)
+        ),
+        rid: uuidv4()
+      }
+    ))
+
   ws.send(
     JSON.stringify(
       {
@@ -123,6 +136,23 @@ ws.on('message', function read(data) {
         if (eventIndex != undefined) {
           console.log(events[eventIndex].name)
 
+          if (betting.current_bet != undefined) {
+            betting.profit -= 10
+            
+            if(events[eventIndex].type == betting.current_bet) {
+              betting.profit += (10 * betting.current_bet_price)
+            }
+
+            if(betting.current_bet == '!throw-in' && events[eventIndex].type != 'throw-in') {
+              betting.profit += (10 * betting.current_bet_price)
+            }
+
+            console.log(betting.profit)            
+            
+            betting.current_bet = undefined
+            betting.current_bet_price = 0
+          }
+
           if (events[eventIndex].type == 'goal') { }
 
           if (events[eventIndex].type == 'offside') { }
@@ -131,17 +161,13 @@ ws.on('message', function read(data) {
 
           if (events[eventIndex].type == 'goal-kick') { }
 
-          if (events[eventIndex].type == 'free-kick') {
-            makeBet('free-kick', 100)
-            makeBet('goal-kick', 100)
-          }
+          if (events[eventIndex].type == 'free-kick') { }
 
-          if (events[eventIndex].type == 'throw-in') { 
-            makeBet('throw-in', 100)
-          }
+          if (events[eventIndex].type == 'throw-in') { }
 
-          state.events = {}
-          state.events.push(events[eventIndex])
+          if (events[eventIndex].type != 'throw-in') {
+            makeBet('!throw-in', 100)
+          }
         }
       }
       break
@@ -167,9 +193,12 @@ function makeBet(betType, amount) {
     index => state.markets[index].type == betType
   )
 
+  betting.current_bet = state.markets[marketId].type
+  betting.current_bet_price = state.match.markets[marketId].price
+
   console.log(
-    state.markets[marketId].type,
-    state.match.markets[marketId].price
+    betting.current_bet,
+    betting.current_bet_price
   )
 
   // ws.send(
