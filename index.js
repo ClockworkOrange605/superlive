@@ -5,30 +5,24 @@ const { v4: uuidv4 } = require('uuid');
 
 const config = {
   url: "wss://production.nbaplus.tk:8000/ws",
-  token: 
-  "eyJwcm90ZWN0ZWQiOiJleUpoYkdjaU9pSkZRMFJJTFVWVEswRXlOVFpMVnlJc0ltVnVZeUk2SWtFeU5UWkhRMDBpTENKbGNHc2lPbnNpYTNSNUlqb2lSVU1pTENKamNuWWlPaUpRTFRNNE5DSXNJbmdpT2lKeExUTmZlWGR4Y0dab1JsRmFjMkZDVUhkSlJ6TkJRelpUYjFKWVpsbFVkMW8xWWxjNWEwbFBhRWQyWkdFeFNYZEVSSEI2VFZSc1RrUm1kRE5PY2pWTElpd2llU0k2SWs5VmJYaGhjbWh5TFRSdWRIVlBNbkozTFhCM1p6TklVUzFRYkhsTmMzUnFOUzEzZEc4MVVXTklSbGhMUjA5WFoyVmFWbU5vZVZOa1V6Z3hWVTVGV1dnaWZYMCIsInJlY2lwaWVudHMiOlt7ImVuY3J5cHRlZF9rZXkiOiJXc3dXZWU5ZHBEQnpwWXhYUVpKRF9GSkNEQmpfaUVVZ0VkcUo1dTVteFhxS1hjamwtWUh3bHcifV0sImFhZCI6ImV5SndiR0YwWm05eWJWOXBaQ0k2SW1KcGJtZHZZbTl2YlNJc0luVnpaWEpmZEc5clpXNGlPaUkxTmpCak4yTXlOaTA1TWpCakxUUTROV1V0T1dSaVpTMWhaak14TXpNeU1XRTRNR0VpZlEiLCJpdiI6Im5CN1o4NWxLaEoyOWxPc04iLCJjaXBoZXJ0ZXh0IjoiZzhMeTdlR0owY3RaZVdJa3hfQ29sY3FSZ3k4T2ZaVVdpYlFhYVUwRXZ3Z2sxOFlPdW1jaG1Ja1RVX3JiSnFkVFgtU00wWVRZX0R6UHc0am9VTVZNWDJxQ3J4eUlMNmtDYnhkQ2ljMTVEWG9aWFZDd19nVjRWanEzSnRZYUlXTjAwbmdvU3BFUFh6Q1JSUW5oaGh2NGp3cWpMeDRsTFFzY3ZNX0JaaTVCMjRtWkxqWDBGMGt0bjJVTEZITmdfVmUyN0JVRUt3IiwidGFnIjoibjNGSzJYSUVSTnN2TDZwVVUyTlc1USJ9=="
+  token: "eyJwcm90ZWN0ZWQiOiJleUpoYkdjaU9pSkZRMFJJTFVWVEswRXlOVFpMVnlJc0ltVnVZeUk2SWtFeU5UWkhRMDBpTENKbGNHc2lPbnNpYTNSNUlqb2lSVU1pTENKamNuWWlPaUpRTFRNNE5DSXNJbmdpT2lKbVRYVlFhM3BXYUVsRFVXOHpiMDF5UmpKelZVbDNiV3hOVEdVdFFWRk5jR1JPZHpsdWRrTTNjakZaYW1GdGFtUnhkRkZJYkRnNFExbDJZMWN4WDJ4UElpd2llU0k2SWtWYU1qVnJNbTQzYTJFMFZqUnpTRzFHT1VWM1RVSmxVMms0UlVsWk56aFZNRzFHWTBaWlNuUTNYMmhRVDBVMFducFFNbVpEVDJKTE1GbE9hSGxaYWpZaWZYMCIsInJlY2lwaWVudHMiOlt7ImVuY3J5cHRlZF9rZXkiOiI2cFlLcl96eHpzSXJSaGlTek5wSWItRE9FR0U5dFNnbzhjOGp2NVZoQ2lRRnFzcXhUWEtnNGcifV0sImFhZCI6ImV5SndiR0YwWm05eWJWOXBaQ0k2SW1KcGJtZHZZbTl2YlNJc0luVnpaWEpmZEc5clpXNGlPaUl3WlRBeVpEazFaaTFtT0dVNUxUUmxZakl0T0RVM09TMWpOR1U1WVdWbVlUQmlOV1VpZlEiLCJpdiI6IjgxbWtaaWUyY0VwT3JUSXciLCJjaXBoZXJ0ZXh0IjoiNDZ3QzZPRVl4dTJWcDlXMU9IcjdfU2tCaGQyeXExcGNKZmZ4SV9KUFZzLTFON1pDZlFXTGtTcE5hYkdhS3VMMXpkLXBRMng2Wmw0Rzg1ZzQyb0RMZElVWjBpaUpmRzluUC1DMXg1RWl0eVlWMGtQejJBQWhTVlJLZTlTS2lmSjI3S2lEX1ZRS3ZabXpwMnBXUkU4MXU0eW14V0RCZ2pWc1RaSjh0dTJoRE53M2lrX0ZBRXhzT0VySHg4ZGRXZzlUdzdwZGJxSmR0MXRZQ3E4X2ZlbmJ1OXAwbnFsbCIsInRhZyI6IkVaRG5hVGUydklPVFROSE9leldpTFEifQ=="
 }
 
 const eventTypes = ['goal', 'goal-kick', 'offside', 'corner-kick', 'free-kick', 'throw-in']
 const betTypes = ['free-kick', 'goal-kick', 'offside', '!goal', 'corner-kick|free-kick', 'corner-kick|goal|throw-in', 'corner-kick', 'goal|goal-kick', 'goal', 'offside|throw-in', '!free-kick', 'throw-in', 'free-kick|goal-kick|offside', '!throw-in']
+const betStakes = [10, 20, 60, 180, 540, 1620, 4860]
 
 const state = {}
 const betting = {}
+betting.balance = 0
 betting.profit = 0
+
+// betting.notThrowIn = false
+// betting.throwIn = false
 
 const ws = new WebSocket(config.url)
 
 ws.on('open', function open() {
-  console.log(JSON.stringify(
-      {
-        type: 'auth',
-        payload: JSON.parse(
-          atob(config.token)
-        ),
-        rid: uuidv4()
-      }
-    ))
-
   ws.send(
     JSON.stringify(
       {
@@ -84,10 +78,12 @@ ws.on('message', function read(data) {
 
     case 'get-user-data':
       state.balance = message.payload.balance
+      console.log(state.balance)
       break
 
-    // case 'balance-changed':
-    //   break;
+    case 'balance-changed':
+      state.balance = message.payload.balance
+      break;
 
     case 'list-matches-v2':
       state.match = {}
@@ -111,6 +107,10 @@ ws.on('message', function read(data) {
 
       console.log(message.payload[state.match.id].teams)
       console.log(message.payload[state.match.id].state)
+
+      if(message.payload[state.match.id].state.type == 'not-started') {
+        betting.notThrowIn = true
+      }
       break
 
     case 'autounsubscribe-match':
@@ -136,22 +136,27 @@ ws.on('message', function read(data) {
         if (eventIndex != undefined) {
           console.log(events[eventIndex].name)
 
-          if (betting.current_bet != undefined) {
-            betting.profit -= 10
+          // if (betting.current_bet != undefined) {
+          //   betting.profit -= 10
             
-            if(events[eventIndex].type == betting.current_bet) {
-              betting.profit += (10 * betting.current_bet_price)
-            }
+          //   if(betting.current_bet == 'throw-in' && events[eventIndex].type == 'throw-in') {
+          //     betting.profit += (10 * betting.current_bet_price)
+          //   } else if(betting.current_bet == 'throw-in' && events[eventIndex].type != 'throw-in') {
+          //     betting.throwIn = false
+          //   }
 
-            if(betting.current_bet == '!throw-in' && events[eventIndex].type != 'throw-in') {
-              betting.profit += (10 * betting.current_bet_price)
-            }
+          //   if(betting.current_bet == '!throw-in' && events[eventIndex].type != 'throw-in') {
+          //     betting.profit += (10 * betting.current_bet_price)
+          //   } else if(betting.current_bet == '!throw-in' && events[eventIndex].type == 'throw-in') {
+          //     betting.notThrowIn = false
+          //     betting.throwIn = true
+          //   }
 
-            console.log(betting.profit)            
+          //   console.log(betting.profit)            
             
-            betting.current_bet = undefined
-            betting.current_bet_price = 0
-          }
+          //   betting.current_bet = undefined
+          //   betting.current_bet_price = 0
+          // }
 
           if (events[eventIndex].type == 'goal') { }
 
@@ -163,20 +168,30 @@ ws.on('message', function read(data) {
 
           if (events[eventIndex].type == 'free-kick') { }
 
-          if (events[eventIndex].type == 'throw-in') { }
+          if (events[eventIndex].type == 'throw-in') {
+            // if(betting.throwIn) {
+              // makeBet('throw-in', 100)
+            // }
+          }
 
           if (events[eventIndex].type != 'throw-in') {
-            makeBet('!throw-in', 100)
+            // if(betting.notThrowIn) {
+              makeBet('!throw-in', 100)
+            // }
           }
         }
       }
       break
 
-    // case 'make-bet':
-    //   break
+    case 'make-bet':
+      console.log(message.payload.bet_id)
+      break
 
-    // case 'bet-update':
-    //   break
+    case 'bet-update':
+      if(message.payload.match_id == state.match.id) {
+        console.log(message.payload.bet_id, message.payload.status, message.payload.processed_price, message.payload.calculation_event_type)
+      }      
+      break
 
     default:
       console.log(message)
@@ -195,30 +210,32 @@ function makeBet(betType, amount) {
 
   betting.current_bet = state.markets[marketId].type
   betting.current_bet_price = state.match.markets[marketId].price
-
-  console.log(
-    betting.current_bet,
-    betting.current_bet_price
-  )
-
-  // ws.send(
-  //   JSON.stringify(
-  //     {
-  //       type: 'make-bet',
-  //       payload: {
-  //         match_id: state.match.id,
-  //         market: {
-  //           id: marketId,
-  //           type: state.markets[marketId].type,
-  //           price: state.match.markets[marketId].price,
-  //         },
-  //         amount: 100,
-  //         allow_price_change: true,
-  //         is_auto_bet: false,
-  //         is_max_bet: false,
-  //       },
-  //       rid: uuidv4()
-  //     }
-  //   )
-  // )
+  
+  if(state.betting && betting.current_bet_price > 1.5) {
+    console.log(
+      betting.current_bet,
+      betting.current_bet_price
+    )
+    
+    ws.send(
+      JSON.stringify(
+        {
+          type: 'make-bet',
+          payload: {
+            match_id: state.match.id,
+            market: {
+              id: marketId,
+              type: state.markets[marketId].type,
+              price: state.match.markets[marketId].price,
+            },
+            amount: 1000,
+            allow_price_change: true,
+            is_auto_bet: false,
+            is_max_bet: false,
+          },
+          rid: uuidv4()
+        }
+      )
+    )
+  }
 }
