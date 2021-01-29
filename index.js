@@ -5,20 +5,53 @@ const { v4: uuidv4 } = require('uuid');
 
 const config = {
   url: "wss://production.nbaplus.tk:8000/ws",
-  token: "eyJwcm90ZWN0ZWQiOiJleUpoYkdjaU9pSkZRMFJJTFVWVEswRXlOVFpMVnlJc0ltVnVZeUk2SWtFeU5UWkhRMDBpTENKbGNHc2lPbnNpYTNSNUlqb2lSVU1pTENKamNuWWlPaUpRTFRNNE5DSXNJbmdpT2lKbVRYVlFhM3BXYUVsRFVXOHpiMDF5UmpKelZVbDNiV3hOVEdVdFFWRk5jR1JPZHpsdWRrTTNjakZaYW1GdGFtUnhkRkZJYkRnNFExbDJZMWN4WDJ4UElpd2llU0k2SWtWYU1qVnJNbTQzYTJFMFZqUnpTRzFHT1VWM1RVSmxVMms0UlVsWk56aFZNRzFHWTBaWlNuUTNYMmhRVDBVMFducFFNbVpEVDJKTE1GbE9hSGxaYWpZaWZYMCIsInJlY2lwaWVudHMiOlt7ImVuY3J5cHRlZF9rZXkiOiI2cFlLcl96eHpzSXJSaGlTek5wSWItRE9FR0U5dFNnbzhjOGp2NVZoQ2lRRnFzcXhUWEtnNGcifV0sImFhZCI6ImV5SndiR0YwWm05eWJWOXBaQ0k2SW1KcGJtZHZZbTl2YlNJc0luVnpaWEpmZEc5clpXNGlPaUl3WlRBeVpEazFaaTFtT0dVNUxUUmxZakl0T0RVM09TMWpOR1U1WVdWbVlUQmlOV1VpZlEiLCJpdiI6IjgxbWtaaWUyY0VwT3JUSXciLCJjaXBoZXJ0ZXh0IjoiNDZ3QzZPRVl4dTJWcDlXMU9IcjdfU2tCaGQyeXExcGNKZmZ4SV9KUFZzLTFON1pDZlFXTGtTcE5hYkdhS3VMMXpkLXBRMng2Wmw0Rzg1ZzQyb0RMZElVWjBpaUpmRzluUC1DMXg1RWl0eVlWMGtQejJBQWhTVlJLZTlTS2lmSjI3S2lEX1ZRS3ZabXpwMnBXUkU4MXU0eW14V0RCZ2pWc1RaSjh0dTJoRE53M2lrX0ZBRXhzT0VySHg4ZGRXZzlUdzdwZGJxSmR0MXRZQ3E4X2ZlbmJ1OXAwbnFsbCIsInRhZyI6IkVaRG5hVGUydklPVFROSE9leldpTFEifQ=="
+  token: require('./token.json')
 }
 
 const eventTypes = ['goal', 'goal-kick', 'offside', 'corner-kick', 'free-kick', 'throw-in']
-const betTypes = ['free-kick', 'goal-kick', 'offside', '!goal', 'corner-kick|free-kick', 'corner-kick|goal|throw-in', 'corner-kick', 'goal|goal-kick', 'goal', 'offside|throw-in', '!free-kick', 'throw-in', 'free-kick|goal-kick|offside', '!throw-in']
-const betStakes = [10, 20, 60, 180, 540, 1620, 4860]
 
-const state = {}
-const betting = {}
-betting.balance = 0
-betting.profit = 0
+const settings = {
+  betting: true,
+  bet_amount: 1000,
+  bet_stop: 2500,
+}
 
-// betting.notThrowIn = false
-// betting.throwIn = false
+const state = {
+  session: undefined,
+  betting: undefined,
+  
+  balance: {
+    initial: undefined,
+    current: undefined,
+    max: undefined,
+    min: undefined
+  },
+
+  markets: undefined,
+
+  match: {
+    id: undefined,
+    markets: undefined
+  },
+
+  bets: {
+    pending: undefined
+  }
+}
+
+const betting = {
+  current_bet: undefined,
+  current_bet_price: 0,
+  raise: false,
+}
+
+const counter = {
+  safe: 0,
+  attack: 0,
+  danger: 0,
+  won: 0,
+  lost: 0
+}
 
 const ws = new WebSocket(config.url)
 
@@ -46,8 +79,6 @@ ws.on('message', function read(data) {
       break
 
     case 'auth':
-      state.auth = message.payload.result
-
       ws.send(
         JSON.stringify(
           {
@@ -77,16 +108,26 @@ ws.on('message', function read(data) {
       break
 
     case 'get-user-data':
-      state.balance = message.payload.balance
-      console.log(state.balance)
+      state.balance.initial = state.balance.current = message.payload.balance
+      state.balance.max = state.balance.min = message.payload.balance
       break
 
     case 'balance-changed':
-      state.balance = message.payload.balance
+      state.balance.current = message.payload.balance
+
+      state.balance.max = Math.max(state.balance.current, state.balance.max)
+      state.balance.min = Math.min(state.balance.current, state.balance.min)
+
+      if(state.balance.max - state.balance.current > settings.bet_stop) {
+        settings.betting = false
+        console.log('STOP BETTING')
+      }
+
+      console.log('BALANCE changed', state.balance)
       break;
 
     case 'list-matches-v2':
-      state.match = {}
+      // console.log(message.payload.matches)
       state.match.id = message.payload.matches[0].id
 
       ws.send(
@@ -107,14 +148,10 @@ ws.on('message', function read(data) {
 
       console.log(message.payload[state.match.id].teams)
       console.log(message.payload[state.match.id].state)
-
-      if(message.payload[state.match.id].state.type == 'not-started') {
-        betting.notThrowIn = true
-      }
       break
 
     case 'autounsubscribe-match':
-      console.log('match finished')
+      console.log('MATCH finished')
       ws.close()
       break
 
@@ -134,29 +171,8 @@ ws.on('message', function read(data) {
         )
 
         if (eventIndex != undefined) {
+          console.log(Date.now()/1000)
           console.log(events[eventIndex].name)
-
-          // if (betting.current_bet != undefined) {
-          //   betting.profit -= 10
-            
-          //   if(betting.current_bet == 'throw-in' && events[eventIndex].type == 'throw-in') {
-          //     betting.profit += (10 * betting.current_bet_price)
-          //   } else if(betting.current_bet == 'throw-in' && events[eventIndex].type != 'throw-in') {
-          //     betting.throwIn = false
-          //   }
-
-          //   if(betting.current_bet == '!throw-in' && events[eventIndex].type != 'throw-in') {
-          //     betting.profit += (10 * betting.current_bet_price)
-          //   } else if(betting.current_bet == '!throw-in' && events[eventIndex].type == 'throw-in') {
-          //     betting.notThrowIn = false
-          //     betting.throwIn = true
-          //   }
-
-          //   console.log(betting.profit)            
-            
-          //   betting.current_bet = undefined
-          //   betting.current_bet_price = 0
-          // }
 
           if (events[eventIndex].type == 'goal') { }
 
@@ -166,30 +182,110 @@ ws.on('message', function read(data) {
 
           if (events[eventIndex].type == 'goal-kick') { }
 
-          if (events[eventIndex].type == 'free-kick') { }
-
-          if (events[eventIndex].type == 'throw-in') {
-            // if(betting.throwIn) {
-              // makeBet('throw-in', 100)
-            // }
+          if (events[eventIndex].type == 'free-kick') {
+            // makeBet('!throw-in', 1000)
           }
 
-          if (events[eventIndex].type != 'throw-in') {
-            // if(betting.notThrowIn) {
-              makeBet('!throw-in', 100)
-            // }
+          if (events[eventIndex].type == 'throw-in') { }
+
+          if (events[eventIndex].type != 'throw-in') { }
+
+          counter.danger = 0
+
+        } else {
+          if(
+            Object.values(events)
+              .sort((e1, e2) => e1.match_time > e2.match_time)
+              .filter(e => e.type == 'dangerous-attack').length
+          ) {
+            counter.danger += Object.values(events)
+            .sort((e1, e2) => e1.match_time > e2.match_time)
+            .filter(e => e.type == 'dangerous-attack').length
+          } else {
+            counter.danger = 0
           }
+
+          console.log(
+            counter.danger,
+            Object.values(events)
+              .sort((e1, e2) => e1.match_time > e2.match_time)
+              .map(e => e.type),            
+          )
+        }
+
+        if(counter.danger == 1) {
+          console.log(Date.now()/1000)
+        }
+
+        if(counter.danger == 2) {
+          console.log(Date.now()/1000)
+          if (betting.raise) {
+            console.log('raise bet')
+            makeBet('!throw-in', 1000)
+            betting.raise = false
+          } else {
+            makeBet('!throw-in', 1000)
+          }          
         }
       }
       break
 
     case 'make-bet':
-      console.log(message.payload.bet_id)
+      state.bets.pending = {}
+      state.bets.pending.id = message.payload.bet_id
       break
 
     case 'bet-update':
       if(message.payload.match_id == state.match.id) {
-        console.log(message.payload.bet_id, message.payload.status, message.payload.processed_price, message.payload.calculation_event_type)
+        if(message.payload.bet_id == state.bets.pending.id) {
+          switch(message.payload.status) {
+            case 'received':
+              state.bets.pending.status = 'received'
+              state.bets.pending.amount = message.payload.amount
+              break
+
+            case 'accepted':
+              state.bets.pending.status = 'accepted'
+              state.bets.pending.price = message.payload.processed_price
+              console.log(Date.now()/1000)
+              console.log(state.bets.pending)
+              break
+
+            case 'won':
+            case 'lost':
+            case 'betstop':
+              state.bets.pending = undefined
+              break
+
+            default:
+              console.log(message.payload)
+              break
+          }
+        }
+
+
+        if(message.payload.status == 'won' || message.payload.status == 'lost') {
+          console.log(message.payload.bet_id, message.payload.status, message.payload.processed_price, message.payload.calculation_event_type, state.balance.current)
+
+          if(message.payload.status == 'won') {
+            counter.won++
+            counter.lost = 0
+
+            if (counter.won == 1) {
+              betting.raise = true
+            }
+            
+          } else if (message.payload.status == 'lost') {
+            counter.lost++
+            counter.won = 0
+
+            betting.raise = false
+          }
+
+          console.log(counter.won, counter.lost)
+        } else if(message.payload.status == 'acepted') {
+          console.log(message.payload.bet_id, message.payload.status, message.payload.processed_price)
+        }
       }      
       break
 
@@ -210,32 +306,44 @@ function makeBet(betType, amount) {
 
   betting.current_bet = state.markets[marketId].type
   betting.current_bet_price = state.match.markets[marketId].price
-  
-  if(state.betting && betting.current_bet_price > 1.5) {
-    console.log(
-      betting.current_bet,
-      betting.current_bet_price
-    )
     
-    ws.send(
-      JSON.stringify(
-        {
-          type: 'make-bet',
-          payload: {
-            match_id: state.match.id,
-            market: {
-              id: marketId,
-              type: state.markets[marketId].type,
-              price: state.match.markets[marketId].price,
-            },
-            amount: 1000,
-            allow_price_change: true,
-            is_auto_bet: false,
-            is_max_bet: false,
-          },
-          rid: uuidv4()
-        }
-      )
-    )
+  console.log(
+    betting.current_bet,
+    betting.current_bet_price,
+    amount
+  )
+
+  if(settings.betting) {
+    if(state.betting) {
+      if(state.bets.pending == undefined) {
+        console.log(Date.now()/1000)
+        
+        setTimeout(function () {
+          console.log(Date.now()/1000)
+          console.log('bet accepted')
+        }, 10000)
+
+        ws.send(
+          JSON.stringify(
+            {
+              type: 'make-bet',
+              payload: {
+                match_id: state.match.id,
+                market: {
+                  id: marketId,
+                  type: state.markets[marketId].type,
+                  price: state.match.markets[marketId].price,
+                },
+                amount: amount,
+                allow_price_change: true,
+                is_auto_bet: false,
+                is_max_bet: false,
+              },
+              rid: uuidv4()
+            }
+          )
+        )
+      }
+    }
   }
 }
