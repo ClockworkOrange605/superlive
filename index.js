@@ -13,7 +13,8 @@ const eventTypes = ['goal', 'goal-kick', 'offside', 'corner-kick', 'free-kick', 
 const settings = {
   betting: true,
   bet_amount: 1000,
-  bet_stop: 2500,
+  bet_stop: 1500,
+  bank: 10000
 }
 
 const state = {
@@ -31,7 +32,14 @@ const state = {
 
   match: {
     id: undefined,
-    markets: undefined
+    country: undefined,
+    league_id: undefined,
+    league: undefined,
+    status: undefined,
+    start: undefined,
+    markets: undefined,
+    events: [],
+
   },
 
   bets: {
@@ -118,17 +126,30 @@ ws.on('message', function read(data) {
       state.balance.max = Math.max(state.balance.current, state.balance.max)
       state.balance.min = Math.min(state.balance.current, state.balance.min)
 
-      if(state.balance.max - state.balance.current > settings.bet_stop) {
-        settings.betting = false
-        console.log('STOP BETTING')
-      }
-
-      console.log('BALANCE changed', state.balance)
+      console.log('balance', state.balance)
       break;
 
     case 'list-matches-v2':
-      // console.log(message.payload.matches)
-      state.match.id = message.payload.matches[0].id
+      var match = message.payload.matches[0]
+
+      state.match.id = match.id
+      state.match.start = match.start_time
+      state.match.country = match.region_name
+      state.match.league = match.competition_name
+
+      state.match.status = match.state.type
+      //TODO: status change times
+      console.log('status', match.state)
+
+      // TODO: refactor
+      state.match.scores = match.scores.total
+
+      // TODO: refactor
+      state.match.teams = Object.values(match.teams)
+        .map((item, index) => ({
+          id: Object.keys(match.teams)[index], 
+          side: item.side, name: item.name
+        }))
 
       ws.send(
         JSON.stringify(
@@ -141,91 +162,106 @@ ws.on('message', function read(data) {
           }
         )
       )
-      break
+    break
 
     case 'subscribe-match':
-      state.markets = message.payload[state.match.id].markets
+      var match = message.payload[state.match.id]
 
-      console.log(message.payload[state.match.id].teams)
-      console.log(message.payload[state.match.id].state)
+      state.match.league_id = match.competition_id
+      
+      //TODO: refacor
+      state.markets = match.markets
+      
+      //TODO: make processing
+      // match.events
+
+      console.log(state.match)
       break
 
     case 'autounsubscribe-match':
-      console.log('MATCH finished')
+      console.log(state.match)
       ws.close()
       break
 
     case 'match-update':
-      state.betting = !message.payload[state.match.id].betstop
+      state.betting = !message.payload[state.match.id].betstop      
 
-      let events = message.payload[state.match.id].events
+      let status = message.payload[state.match.id].state
+      let scores = message.payload[state.match.id].scores
+
       let markets = message.payload[state.match.id].markets
+      let events = message.payload[state.match.id].events
+
+      if(status != undefined) {
+        console.log('status', status)
+        state.match.status = status.type
+        // settings.betting = true
+      }
+
+      if(scores != undefined) {
+        state.match.scores = scores.total
+      }
 
       if (markets != undefined) {
         state.match.markets = markets
       }
 
       if (events != undefined) {
-        let eventIndex = Object.keys(events).find(
-          index => eventTypes.includes(events[index].type)
-        )
+        let mainEvent = Object.values(events)
+          .find(
+            item => eventTypes.includes(item.type)
+          )
 
-        if (eventIndex != undefined) {
-          console.log(Date.now()/1000)
-          console.log(events[eventIndex].name)
+        let otherEvents = Object.values(events)
+          .filter(
+            item => ['ball-safe', 'attack', 'dangerous-attack'].includes(item.type)
+          )
 
-          if (events[eventIndex].type == 'goal') { }
+        if(mainEvent != undefined) {
+          state.match.events.push(mainEvent)
 
-          if (events[eventIndex].type == 'offside') { }
+          console.log(
+            mainEvent.match_time, 
+            mainEvent.name, 
+            (mainEvent.server_time - state.match.start) / 1000,
+            (Date.now() - state.match.start) / 1000
+          )
 
-          if (events[eventIndex].type == 'corner-kick') { }
-
-          if (events[eventIndex].type == 'goal-kick') { }
-
-          if (events[eventIndex].type == 'free-kick') {
-            // makeBet('!throw-in', 1000)
-          }
-
-          if (events[eventIndex].type == 'throw-in') { }
-
-          if (events[eventIndex].type != 'throw-in') { }
-
+          // TODO: refactor
           counter.danger = 0
+        }
 
-        } else {
+        if(otherEvents.length > 0) {
           if(
-            Object.values(events)
-              .sort((e1, e2) => e1.match_time > e2.match_time)
-              .filter(e => e.type == 'dangerous-attack').length
+            Object.values(otherEvents)
+              .filter(item => item.type == 'dangerous-attack')
+              .length
           ) {
-            counter.danger += Object.values(events)
-            .sort((e1, e2) => e1.match_time > e2.match_time)
-            .filter(e => e.type == 'dangerous-attack').length
+            counter.danger += Object.values(otherEvents)
+              .filter(item => item.type == 'dangerous-attack')
+              .length
           } else {
             counter.danger = 0
           }
 
           console.log(
             counter.danger,
-            Object.values(events)
-              .sort((e1, e2) => e1.match_time > e2.match_time)
-              .map(e => e.type),            
+            Object.values(otherEvents)
+              .map(item => item.type),
+              (Date.now() - state.match.start) / 1000
           )
-        }
 
-        if(counter.danger == 1) {
-          console.log(Date.now()/1000)
-        }
-
-        if(counter.danger == 2) {
-          console.log(Date.now()/1000)
-          if (betting.raise) {
-            console.log('raise bet')
-            makeBet('!throw-in', 1000)
-            betting.raise = false
-          } else {
-            makeBet('!throw-in', 1000)
-          }          
+          if(counter.danger) {
+            if(state.bets.pending == undefined) {
+              if(state.match.events.length > 0) {
+                if(state.match.events[state.match.events.length - 1].type == 'free-kick') {
+                  // if(state.match.events[state.match.events.length - 1].match_time > 1800) {
+                    makeBet('!throw-in', 1000)
+                  // }
+                }
+              }
+            }
+          }
         }
       }
       break
@@ -236,33 +272,50 @@ ws.on('message', function read(data) {
       break
 
     case 'bet-update':
+      
       if(message.payload.match_id == state.match.id) {
-        if(message.payload.bet_id == state.bets.pending.id) {
-          switch(message.payload.status) {
-            case 'received':
-              state.bets.pending.status = 'received'
-              state.bets.pending.amount = message.payload.amount
-              break
+        if(state.bets.pending != undefined) {
+          if(message.payload.bet_id == state.bets.pending.id) {
+            switch(message.payload.status) {
+              case 'received':
+                state.bets.pending.status = 'received'
+                state.bets.pending.amount = message.payload.amount
+                break
 
-            case 'accepted':
-              state.bets.pending.status = 'accepted'
-              state.bets.pending.price = message.payload.processed_price
-              console.log(Date.now()/1000)
-              console.log(state.bets.pending)
-              break
+              case 'accepted':
+                state.bets.pending.status = 'accepted'
+                state.bets.pending.price = message.payload.processed_price
+                console.log(state.bets.pending)
+                break
 
-            case 'won':
-            case 'lost':
-            case 'betstop':
-              state.bets.pending = undefined
-              break
+              case 'lost':
+                if(state.balance.current < state.balance.initial) {
+                  console.log('stop autobeting')
+                  settings.betting = false
+                }
 
-            default:
-              console.log(message.payload)
-              break
+                if(state.balance.current < state.balance.max) {
+                  console.log('stop autobeting')
+                  settings.betting = false
+                }
+
+                if((state.balance.max - state.balance.current) > settings.bet_stop ) {
+                  console.log('stop autobeting')
+                  settings.betting = false
+                }
+
+              case 'won':
+              case 'lost':
+              case 'betstop':
+                state.bets.pending = undefined
+                break
+
+              default:
+                console.log(message.payload)
+                break
+            }
           }
         }
-
 
         if(message.payload.status == 'won' || message.payload.status == 'lost') {
           console.log(message.payload.bet_id, message.payload.status, message.payload.processed_price, message.payload.calculation_event_type, state.balance.current)
@@ -310,16 +363,15 @@ function makeBet(betType, amount) {
   console.log(
     betting.current_bet,
     betting.current_bet_price,
-    amount
+    amount,
+    (Date.now() - state.match.start) / 1000
   )
 
   if(settings.betting) {
     if(state.betting) {
       if(state.bets.pending == undefined) {
-        console.log(Date.now()/1000)
-        
+
         setTimeout(function () {
-          console.log(Date.now()/1000)
           console.log('bet accepted')
         }, 10000)
 
