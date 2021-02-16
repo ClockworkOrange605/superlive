@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  /* background-color: black;
+  color: white; */
 }
 
 .App-logo {
@@ -35,4 +37,54 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.MatchList { }
+
+.MatchList .MatchLink {
+  list-style: none;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #282c34;
+  border-radius: 10px;
+  margin: 15px;
+  padding: 10px;
+  width: 450px;
+  text-align: center;
+  background-color: rgb(128, 128, 128, 0.15);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.MatchList .MatchLink:hover {
+  transform: scale(1.2);
+}
+
+.MatchList .MatchLink > p {
+  margin: 0;
+  height: 18px;
+}
+
+.MatchList .MatchLink .MatchTitle {
+  float: left;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.MatchList .MatchLink .MatchTime {
+  float: right;
+}
+
+.MatchList .MatchLink .MatchLegion {
+  float: left;
+}
+
+.MatchList .MatchLink .MatchRegion {
+  float: right;
+}
+
+.MatchItem {}
+
+.MatchItem .MatchInfo {
+  text-align: left;
+  margin: 10px;
 }

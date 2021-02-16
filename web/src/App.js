@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
@@ -14,20 +13,6 @@ function App() {
   return (
     <div className="App">
       <MatchList />
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          {!data ? 'Loading...' : data}
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
     </div>
   );
 }
@@ -47,25 +32,38 @@ const MatchList = function () {
   }, [selectedMatch])
 
   return (
-    <div className="matchList">
+    <div className="MatchList">
       <MatchItem id={selectedMatch} />
       <h1>Match List</h1>
       <ul>
         {!data ? 'Loading...' : data.map((item, index) => {
           return <li 
-            key={item.id} 
+            key={item.id} className="MatchLink"
             onClick={() => selectMatch(item.id)}
           >
-            ⌚{new Date(item.start_time).toLocaleString()}&nbsp;
-            🌍{item.region_name}&nbsp;
-            🏆{item.competition_name}&nbsp;
-            ⚽
-            {Object.values(item.teams).find(item => item.side == 'home').name}&nbsp;—&nbsp;
-            {Object.values(item.teams).find(item => item.side == 'away').name}
+            <p>
+              <span className="MatchTitle">
+                ⚽&nbsp;
+                {Object.values(item.teams).find(item => item.side == 'home').name}
+                &nbsp;—&nbsp;
+                {Object.values(item.teams).find(item => item.side == 'away').name}
+              </span>
+              <span className="MatchTime">
+                ⌚
+                {
+                  new Intl.DateTimeFormat('ru-RU', {dateStyle: 'short',timeStyle: 'short'})
+                    .format(new Date(item.start_time))
+                }
+              </span>
+            </p>
+            <hr />
+            <p>
+              <span className="MatchLegion">🏆&nbsp;{item.competition_name}</span>
+              <span className="MatchRegion">🌍&nbsp;{item.region_name}</span>
+            </p>
           </li>
         })}
       </ul>
-      <p>{selectedMatch}</p>
     </div>    
   )
 }
@@ -106,13 +104,11 @@ const MatchItem = function ({id}) {
   }, [data])
 
   return (
-    <div className="matchItem">
+    <div className="MatchItem">
       <h1>Match Item</h1>
       <div>
-        <div>
-          <h2>{ !teams ? 'Select Match' : `${teams.home.name} ⚽ ${teams.away.name}`}</h2>
-        </div>
-        <div>
+        <h2>{ !teams ? 'Select Match' : `${teams.home.name} ⚽ ${teams.away.name}`}</h2>
+        <div className="MatchInfo">
           { !states ? '' : states.map((item, index) => {
             return <div key={index}>
               {item.state.type} 
@@ -122,12 +118,17 @@ const MatchItem = function ({id}) {
 
           {!events ? '' : events.map((item, index) => {
             return <div key={index}>
-              {Object.values(item.events).map((item, index) => {
-                return <p key={index} className={item.type}>
-                  {Math.trunc(item.match_time / 60)}:{(item.match_time % 60).toString().padStart(2, 0)}'
-                  {item.name} [{item.side}]
-                </p>
-              })}
+              {
+                Object.values(item.events)
+                  .sort((e1, e2) => { return e1.match_time > e2.match_time })
+                  .map((item, index) => {
+                    return <p key={index} className={item.type}>
+                      {`${Math.trunc(item.match_time / 60)}:${(item.match_time % 60).toString().padStart(2, 0)}' `}
+                      {!item.additional_time ? '' : `${Math.trunc(item.additional_time / 60)}:${(item.additional_time % 60).toString().padStart(2, 0)}' `}
+                      {item.name} [{item.side}] {item.ball_pos ? `${item.ball_pos.x}, ${item.ball_pos.y}` : '()'}
+                    </p>
+                  })
+              }
             </div>
           })}
         </div>
