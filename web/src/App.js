@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 import './App.css';
 
+const Loader = function() {
+  return <div className="Loader">⚽</div>
+}
+
 function App() {
   const [data, setData] = React.useState(null)
 
@@ -36,7 +40,7 @@ const MatchList = function () {
       <MatchItem id={selectedMatch} />
       <h1>Match List</h1>
       <ul>
-        {!data ? 'Loading...' : data.map((item, index) => {
+        {!data ? <Loader /> : data.map((item, index) => {
           return <li 
             key={item.id} className="MatchLink"
             onClick={() => selectMatch(item.id)}
@@ -107,7 +111,7 @@ const MatchItem = function ({id}) {
     <div className="MatchItem">
       <h1>Match Item</h1>
       <div>
-        <h2>{ !teams ? 'Select Match' : `${teams.home.name} ⚽ ${teams.away.name}`}</h2>
+        <h2>{ !teams ? <Loader /> : `${teams.home.name} ⚽ ${teams.away.name}`}</h2>
         <div className="MatchInfo">
           { !states ? '' : states.map((item, index) => {
             return <div key={index}>
