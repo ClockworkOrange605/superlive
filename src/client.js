@@ -1,13 +1,10 @@
-const WebSocket = require('ws');
-const EventEmitter = require('events');
+const config = require('./config/main.js').betboom
 
 const atob = require('atob');
 const { v4: uuidv4 } = require('uuid');
 
-const config = {  
-    url: "wss://production.nbaplus.tk:8000/ws",
-    token: require('../token.json')
-}
+const WebSocket = require('ws');
+const EventEmitter = require('events');
 
 class ApiClient {
 

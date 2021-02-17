@@ -1,12 +1,9 @@
-const WebSocket = require('ws');
+const config = require('./config/main.js').betboom
 
 const atob = require('atob');
 const { v4: uuidv4 } = require('uuid');
 
-const config = {
-  url: "wss://production.nbaplus.tk:8000/ws",
-  token: require('./token.json')
-}
+const WebSocket = require('ws');
 
 const eventTypes = ['goal', 'goal-kick', 'offside', 'corner-kick', 'free-kick', 'throw-in']
 
@@ -289,15 +286,15 @@ ws.on('message', function read(data) {
                 break
 
               case 'lost':
-                if(state.balance.current < state.balance.initial) {
-                  console.log('stop autobeting')
-                  settings.betting = false
-                }
+                // if(state.balance.current < state.balance.initial) {
+                //   console.log('stop autobeting')
+                //   settings.betting = false
+                // }
 
-                if(state.balance.current < state.balance.max) {
-                  console.log('stop autobeting')
-                  settings.betting = false
-                }
+                // if(state.balance.current < state.balance.max) {
+                //   console.log('stop autobeting')
+                //   settings.betting = false
+                // }
 
                 if((state.balance.max - state.balance.current) > settings.bet_stop ) {
                   console.log('stop autobeting')

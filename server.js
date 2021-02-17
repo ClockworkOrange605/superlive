@@ -1,16 +1,10 @@
-const express = require('express')
+const config = require('./config/main.js')
 const path = require('path')
 
-const app = express();
-const port = 3005
-
 const { MongoClient } = require("mongodb")
-const config = {
-  db: {
-    url: "mongodb://localhost:27017",
-    name: "superlive"
-  }
-}
+const express = require('express')
+
+const app = express();
 
 app.use(
   express.static(path.resolve(__dirname, './web/build'))
@@ -78,6 +72,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, './web/build', 'index.html'));
 });
 
-app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`)
+app.listen(config.app.port, () => {
+  console.log(`App listening at http://localhost:${config.app.port}`)
 })

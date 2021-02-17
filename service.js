@@ -1,13 +1,7 @@
-const apiClient = require('./src/client.js')
-const { MongoClient } = require("mongodb");
-const { response } = require('express');
+const config = require('./config/main.js')
 
-const config = {
-  db: {
-    url: "mongodb://localhost:27017",
-    name: "superlive"
-  }
-}
+const { MongoClient } = require("mongodb");
+const apiClient = require('./src/client.js')
 
 sync_matches()
 
