@@ -6,44 +6,49 @@ const Loader = function() {
 }
 
 function App() {
-  const [data, setData] = React.useState(null)
-
-  React.useEffect(() => {
-    fetch('/api/status')
-      .then((res) => res.json())
-      .then((data) => setData(data.status))
-  }, [])
-
-  return (
-    <div className="App">
-      <MatchList />
-    </div>
-  );
-}
-
-const MatchList = function () {
-  const [data, setData] = React.useState(null)
-  const [selectedMatch, selectMatch] = React.useState(null)
+  const [matchList, setMatchList] = React.useState(null)
 
   React.useEffect(() => {
     fetch('/api/match/')
       .then((res) => res.json())
-      .then((data) => setData(data))
+      .then((data) => setMatchList(data))
   }, [])
 
-  useEffect(() => {
-    console.log(`select ${selectedMatch}`)
-  }, [selectedMatch])
+  const [selectedItem, selectMatchItem] = React.useState(null)
+  const [matchItem, setMatchItem] = React.useState(null)
+
+  React.useEffect(() => {
+    fetch('/api/match/' + selectedItem)
+      .then((res) => res.json())
+      .then((data) => setMatchItem(data))
+  }, [selectedItem])
 
   return (
+    <div className="App">
+      <header></header>
+
+      <main>
+        <aside style={{width: '45%', margin: 0, float: 'left'}}>
+          <MatchList matchList={matchList} selectMatchItem={selectMatchItem}/>
+        </aside>
+        <aside style={{width: '45%', margin: 0, float: 'right'}}>
+          <MatchItem matchItem={matchItem} />
+        </aside>
+      </main>
+
+      <footer></footer>
+    </div>
+  );
+}
+
+const MatchList = function ({matchList, selectMatchItem}) {
+  return (
     <div className="MatchList">
-      <MatchItem id={selectedMatch} />
-      <h1>Match List</h1>
       <ul>
-        {!data ? <Loader /> : data.map((item, index) => {
+        {!matchList ? <Loader /> : matchList.map((item, index) => {
           return <li 
             key={item.id} className="MatchLink"
-            onClick={() => selectMatch(item.id)}
+            onClick={() => selectMatchItem(item.id)}
           >
             <p>
               <span className="MatchTitle">
@@ -72,17 +77,7 @@ const MatchList = function () {
   )
 }
 
-const MatchItem = function ({id}) {
-  const [data, setData] = React.useState(null)
-
-  React.useEffect(() => {
-    setData(null)
-
-    fetch('/api/match/' + id)
-      .then((res) => res.json())
-      .then((data) => setData(data))
-  }, [id])
-
+const MatchItem = function ({matchItem}) {
   const [teams, setTeams] = React.useState(null)
   const [states, setStates] = React.useState(null)
   const [events, setEvents] = React.useState(null)
@@ -92,24 +87,23 @@ const MatchItem = function ({id}) {
     setTeams(null)
     setEvents(null)
 
-    if(data) {
+    if(matchItem) {
       setTeams({
-        home: Object.values(data.teams).find(item => item.side == 'home'),
-        away: Object.values(data.teams).find(item => item.side == 'away')
+        home: Object.values(matchItem.teams).find(item => item.side == 'home'),
+        away: Object.values(matchItem.teams).find(item => item.side == 'away')
       })
 
-      if(data.updates) {
-        setEvents(data.updates.filter(item => item.events != undefined))
-        setStates(data.updates.filter(item => item.state != undefined))
+      if(matchItem.updates) {
+        setEvents(matchItem.updates.filter(item => item.events != undefined))
+        setStates(matchItem.updates.filter(item => item.state != undefined))
       }
 
-      console.log(data)
+      console.log(matchItem)
     }
-  }, [data])
+  }, [matchItem])
 
   return (
     <div className="MatchItem">
-      <h1>Match Item</h1>
       <div>
         <h2>{ !teams ? <Loader /> : `${teams.home.name} ⚽ ${teams.away.name}`}</h2>
         <div className="MatchInfo">
