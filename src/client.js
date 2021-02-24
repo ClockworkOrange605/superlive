@@ -1,4 +1,4 @@
-const config = require('./config/main.js').betboom
+const config = require('../config/main.js').betboom
 
 const atob = require('atob');
 const { v4: uuidv4 } = require('uuid');
