@@ -1,5 +1,45 @@
 .App {
   text-align: center;
+  display: grid;
+  overflow: hidden;
+  height: auto;
+  max-height: 100%;
+  grid-template-columns: minmax(300px, 10%), minmax(500px, 80%), minmax(300px, 10%);
+  grid-template-rows: minmax(100px, 10%), minmax(500px, 80%), minmax(200px, 10%);
+}
+
+.Header {
+  position: fixed;
+  width: 100%;
+  background-color: #ff600b;
+  grid-column: 1 / 4;
+  grid-row: 1;
+  min-height: 50px;
+  z-index: 999;
+  border-bottom-left-radius: 35%;
+  border-bottom-right-radius: 35%;
+  box-shadow: 0 10px 20px rgba(14, 8, 8, 0.19), 0 6px 6px rgba(0,0,0,0.23); 
+}
+
+.Footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #00c713;
+  grid-column: 1 / 4;
+  grid-row: 3;
+  min-height: 50px;
+  border-top-left-radius: 35%;
+  border-top-right-radius: 35%;
+  box-shadow: 0 -10px 10px rgb(14 8 8 / 19%), 0 -6px 6px rgb(0 0 0 / 23%);
+}
+
+.Content {
+  padding: 70px 0;
+  overflow: hidden;
+  display: flex;
+  grid-column: 1 / 4;
+  grid-row: 2;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -18,7 +58,11 @@
   }
 }
 
-.MatchList { }
+.MatchList {
+  width: 600px;
+  height: 535px;
+  overflow: auto;
+}
 
 .MatchList .MatchLink {
   list-style: none;
@@ -61,9 +105,48 @@
   float: right;
 }
 
-.MatchItem {}
+.MatchItem {
+  height: 535px;
+  overflow: auto;
+}
 
 .MatchItem .MatchInfo {
   text-align: left;
   margin: 10px;
+}
+
+.MatchItem .EventList {}
+
+.MatchItem .EventList .home { text-align: left; }
+
+.MatchItem .EventList .away { text-align: right; }
+
+.MatchItem .EventList .ball-safe { display: none; }
+
+.MatchItem .EventList .attack { display: none; }
+
+.MatchItem .EventList .dangerous-attack { display: none; }
+
+.MatchItem .EventList .throw-in {
+  color: #ffeb66;
+}
+
+.MatchItem .EventList .free-kick {
+  color: #a6ddff;
+}
+
+.MatchItem .EventList .goal-kick {
+  color: #85f2ef;
+}
+
+.MatchItem .EventList .corner-kick {
+  color: #feb2d5;
+}
+
+.MatchItem .EventList .offside {
+  color: #d6b2ff;
+}
+
+.MatchItem .EventList .goal {
+  color: #ffc6a6;
 }
