@@ -9,17 +9,21 @@ const EventEmitter = require('events');
 class ApiClient {
 
     constructor(callback) {
-        const self = this
-
         this.socket = new WebSocket(config.url)
         this.emmiter = new EventEmitter()
 
-        this.socket.on('open', function() {
+        const self = this
+        this.socket.on('open', () => {
             callback(self)
         })
 
-        this.socket.on('message', function(data) {
+        this.socket.on('message', (data) => {
             let message = JSON.parse(data)
+
+            if(message.error) {
+                console.error('ApiClient Error', message.error)
+                throw('Client Error', message.error)
+            }
 
             switch(message.type) {
                 case 'session-info':
@@ -63,13 +67,17 @@ class ApiClient {
                     break
 
                 default:
-                    console.log(message.type, message.payload)
+                    console.warn('unprocessed message', message.type, message.payload)
                     break
             }
         })
 
-        this.socket.on('close', function(code, message) {
-            console.log('exit', code, message)
+        this.socket.on('close', (code) => {
+            console.log('ApiClient socket closed', code)
+        })
+
+        this.socket.on('error', (err) => {
+            console.error('ApiClient connection error', err)
         })
     }
 
