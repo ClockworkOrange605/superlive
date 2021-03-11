@@ -1,26 +1,8 @@
 const config = require('./config/main.js')
-// config.db.collection = 'matches_test'
+config.db.collection = 'matches_v2'
 
 const ApiClient = require('./src/client.js')
 const { MongoClient } = require("mongodb");
-
-// console.time('MatchList Update')
-// getMatches({offset: 0, limit: 10}, (matches) => {
-//   updateMatches(matches, (matches) => {
-//     console.log(matches.length, matches)
-//     console.timeEnd('MatchList Update')
-//   })
-// })
-
-// console.time('Watch Match')
-// getMatches({offset: 0, limit: 1}, (matches) => {
-//   updateMatches(matches, (matches) => {
-//     watchMatch(matches[0], (result) => {
-//       console.log(result)
-//       console.timeEnd('Watch Match')
-//     })
-//   })
-// })
 
 setInterval(function() {
   getMatches({offset: 0, limit: 5}, (matches) => {
@@ -52,12 +34,13 @@ function updateMatch(match, callback) {
   MongoClient.connect(config.db.url, { useUnifiedTopology: true }, async (err, dbClient) => {
     if(err != null) console.error(err)
 
-    const collection = dbClient.db(config.db.name).collection('matches_test')
+    const collection = dbClient.db(config.db.name).collection(config.db.collection)
     collection.updateOne(
       {_id: match._id}, 
       {$set: match}, 
     (err, result) => {
       if(err != null) console.error(err)
+      dbClient.close()
       callback(result)
     })
 
@@ -110,7 +93,7 @@ function updateMatches(matches, callback) {
   MongoClient.connect(config.db.url, { useUnifiedTopology: true }, async (err, dbClient) => {
     if(err != null) console.error(err)
 
-    const collection = dbClient.db(config.db.name).collection('matches_test')
+    const collection = dbClient.db(config.db.name).collection(config.db.collection)
     const promises = []
 
     matches

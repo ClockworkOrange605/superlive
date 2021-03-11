@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import './App.css';
 
 import iconThrowIn from './svg/throw-in.svg'
@@ -60,21 +60,21 @@ const MatchList = function ({matchList, selectMatchItem}) {
       <ul>
         {!matchList ? <Loader /> : matchList.map((item, index) => {
           return <li 
-            key={item.id} className="MatchLink"
+            key={item.id} className={`MatchLink ${item.state}`}
             onClick={() => selectMatchItem(item.id)}
           >
             <p>
               <span className="MatchTitle">
                 ⚽&nbsp;
-                {Object.values(item.teams).find(item => item.side == 'home').name}
+                {item.teams.home.name}
                 &nbsp;—&nbsp;
-                {Object.values(item.teams).find(item => item.side == 'away').name}
+                {item.teams.away.name}
               </span>
               <span className="MatchTime">
                 ⌚
                 {
                   new Intl.DateTimeFormat('ru-RU', {dateStyle: 'short',timeStyle: 'short'})
-                    .format(new Date(item.start_time))
+                    .format(new Date(item.start))
                 }
               </span>
             </p>
@@ -92,24 +92,13 @@ const MatchList = function ({matchList, selectMatchItem}) {
 }
 
 const MatchItem = function ({matchItem}) {
-  const [teams, setTeams] = React.useState(null)
-  const [states, setStates] = React.useState(null)
   const [events, setEvents] = React.useState(null)
 
   useEffect(() => {
-    setStates(null)
-    setTeams(null)
     setEvents(null)
 
     if(matchItem) {
-      setTeams({
-        home: Object.values(matchItem.teams).find(item => item.side == 'home'),
-        away: Object.values(matchItem.teams).find(item => item.side == 'away')
-      })
-
       if(matchItem.updates) {
-        // setEvents(matchItem.updates.filter(item => item.events != undefined))
-        // setStates(matchItem.updates.filter(item => item.state != undefined))
 
         let currentState = {
           states: [],
@@ -119,7 +108,7 @@ const MatchItem = function ({matchItem}) {
         matchItem.updates.forEach(item => {
           if(item.betstop) {
             currentState.betstop = true
-            console.log('betting stopped')
+            // console.log('betting stopped')
           }
 
           if(item.state) {
@@ -133,14 +122,11 @@ const MatchItem = function ({matchItem}) {
           }
 
           if(item.markets) {
-            console.log('markets changed', item.markets)
+            // console.log('markets changed', item.markets)
           }
         })
 
         setEvents(currentState.events)
-        setStates(currentState.states)
-
-        console.log(currentState)
       }
     }
   }, [matchItem])
@@ -148,7 +134,12 @@ const MatchItem = function ({matchItem}) {
   return (
     <div className="MatchItem">
       <div>
-        <h2>{ !teams ? <Loader /> : `${teams.home.name} ⚽ ${teams.away.name}`}</h2>
+        <h2>
+          { !matchItem ? 
+            <Loader /> : 
+            `${matchItem.teams.home.name} ⚽ ${matchItem.teams.away.name}`
+          }
+        </h2>
         <div className="MatchInfo">
 
           {events && (
@@ -180,9 +171,9 @@ const MatchItem = function ({matchItem}) {
             </div>
           )}
 
-          {states && (
+          {matchItem && matchItem.periods && (
             <div>
-              {states.map((item, index) => {
+              {matchItem.periods.map((item, index) => {
                 return <div key={index}>
                   {item.type}&nbsp;⏰&nbsp;{!item.server_time ? 'unknown' : new Date(item.server_time).toLocaleString()}
                 </div>
@@ -190,14 +181,16 @@ const MatchItem = function ({matchItem}) {
             </div>
           )}
 
-          
           {events && (
             <div className="EventList">
               {Object.values(events).map((item, index) => {
                 return <div key={index} className={`${item.type} ${item.side}`}>
                   {`${Math.trunc(item.match_time / 60)}:${(item.match_time % 60).toString().padStart(2, 0)}' `}
                   {!item.additional_time ? '' : `${Math.trunc(item.additional_time / 60)}:${(item.additional_time % 60).toString().padStart(2, 0)}' `}
-                  {item.name} [{item.side}] {item.ball_pos ? `(${item.ball_pos.x}, ${item.ball_pos.y})` : '()'}
+                  {item.name} 
+                  {/*}
+                  [{item.side}] {item.ball_pos ? `(${item.ball_pos.x}, ${item.ball_pos.y})` : '()'}
+                  */}
                 </div>
               })}
             </div>
@@ -205,14 +198,6 @@ const MatchItem = function ({matchItem}) {
         </div>
       </div>
     </div>
-  )
-}
-
-const MatchItemUpdates = function({item}) {
-  return (
-    item.map((item) => {
-
-    })
   )
 }
 

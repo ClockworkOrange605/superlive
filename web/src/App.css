@@ -35,11 +35,12 @@
 }
 
 .Content {
-  padding: 70px 0;
-  overflow: hidden;
   display: flex;
+  padding: 55px 0;  
   grid-column: 1 / 4;
   grid-row: 2;
+  background-color: black;
+  color: white;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -61,14 +62,14 @@
 .MatchList {
   width: 600px;
   height: 535px;
-  overflow: auto;
+  overflow: overlay;
 }
 
 .MatchList .MatchLink {
   list-style: none;
   font-size: 12px;
   cursor: pointer;
-  border: 1px solid #282c34;
+  border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   margin: 15px;
   padding: 10px;
@@ -76,6 +77,10 @@
   text-align: center;
   background-color: rgb(128, 128, 128, 0.15);
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.MatchList .MatchLink.finished {
+  background-color: rgba(0, 130, 50, 0.15);
 }
 
 .MatchList .MatchLink:hover {
@@ -107,7 +112,7 @@
 
 .MatchItem {
   height: 535px;
-  overflow: auto;
+  overflow: overlay;
 }
 
 .MatchItem .MatchInfo {
@@ -115,17 +120,29 @@
   margin: 10px;
 }
 
-.MatchItem .EventList {}
+.MatchItem .EventList {
+  /* margin: auto; */
+  width: 550px;
+}
 
 .MatchItem .EventList .home { text-align: left; }
 
 .MatchItem .EventList .away { text-align: right; }
 
-.MatchItem .EventList .ball-safe { display: none; }
+.MatchItem .EventList .ball-safe { 
+  color: rgba(55, 172, 81, 0.438);
+  display: none; 
+}
 
-.MatchItem .EventList .attack { display: none; }
+.MatchItem .EventList .attack { 
+  color: orange;
+  display: none; 
+}
 
-.MatchItem .EventList .dangerous-attack { display: none; }
+.MatchItem .EventList .dangerous-attack { 
+  color: red;
+  display: none; 
+}
 
 .MatchItem .EventList .throw-in {
   color: #ffeb66;

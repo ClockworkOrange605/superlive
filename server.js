@@ -1,4 +1,5 @@
 const config = require('./config/main.js')
+config.db.collection = 'matches_v2'
 const path = require('path')
 
 const { MongoClient } = require("mongodb")
@@ -21,25 +22,22 @@ app.get('/api/match/', (req, res) => {
     if(err != null) console.error(err)
 
     const db = dbClient.db(config.db.name)
-    const collection = db.collection('matches')
+    const collection = db.collection(config.db.collection)
 
     collection
       .find({}, {
         projection: {
           id: 1,
-          start_time: 1,
+          start: 1,
           state: 1,
           region_name: 1,
-          competition_id: 1, 
           competition_name: 1, 
           teams: 1,
-          scores: 1,
+          scores: 1
         },
-        sort: {start_time: -1},
-        // limit: 10,
+        sort: {start: -1},
+        limit: 100,
       })
-      // .sort({start_time: -1})
-      // .limit(10)
       .toArray((err, result) => {
         if(err != null) console.error(err)
 
@@ -56,7 +54,7 @@ app.get('/api/match/:id/', (req, res) => {
     if(err != null) console.error(err)
 
     const db = dbClient.db(config.db.name)
-    const collection = db.collection('matches')
+    const collection = db.collection(config.db.collection)
 
     collection
       .findOne({id: req.params.id}, (err, result) => {
