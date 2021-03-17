@@ -73,7 +73,7 @@ class ApiClient {
         })
 
         this.socket.on('close', (code) => {
-            console.log('ApiClient socket closed', code)
+            // console.log('ApiClient socket closed', code)
         })
 
         this.socket.on('error', (err) => {

@@ -8,7 +8,7 @@ setInterval(function() {
   getMatches({offset: 0, limit: 5}, (matches) => {
     updateMatches(matches, (matches) => {
       matches.filter(item => {
-        return item.start > Date.now() && 
+        return item.start > Date.now() &&
         item.start < (Date.now() + 300000)
       }).forEach(match => processMatch(match))
     })
@@ -24,7 +24,7 @@ function processMatch(match) {
     } else {
       console.warn('saving', result.match.id)
       updateMatch(match, (result) => {
-        console.log(result)
+        // console.log(result)
       })
     }
   })
@@ -36,15 +36,16 @@ function updateMatch(match, callback) {
 
     const collection = dbClient.db(config.db.name).collection(config.db.collection)
     collection.updateOne(
-      {_id: match._id}, 
-      {$set: match}, 
+      {_id: match._id},
+      {$set: match},
     (err, result) => {
       if(err != null) console.error(err)
       dbClient.close()
+      console.log(result.result, result.modifiedCount)
       callback(result)
     })
 
-  })  
+  })
 }
 
 function watchMatch(match, callback) {
@@ -84,7 +85,7 @@ function watchMatch(match, callback) {
           client.socket.close()
           match.watcher.push({type: 'unsibscribed', time: Date.now()})
         })
-      })      
+      })
     })
   })
 }
@@ -101,7 +102,7 @@ function updateMatches(matches, callback) {
         promises.push(
           new Promise((resolve, reject) => {
             collection.findOne({id: match.id}, (err, result) => {
-              if(err != null) reject(err)    
+              if(err != null) reject(err)
               if(result == null) {
                 collection.insertOne(match, (err, result) => {
                   if(err != null) reject(err)
@@ -109,8 +110,8 @@ function updateMatches(matches, callback) {
                 })
               } else {
                 resolve(result)
-              }              
-            })                
+              }
+            })
           })
         )
       })
@@ -123,7 +124,7 @@ function updateMatches(matches, callback) {
         dbClient.close()
         throw(errors)
       })
-  })            
+  })
 }
 
 function getMatches({limit=10, offset=0}, callback) {
@@ -162,10 +163,10 @@ function getMatches({limit=10, offset=0}, callback) {
               markets: {},
               updates: [],
               watcher: []
-            }))             
-          
+            }))
+
           callback(result)
         })
-      })  
+      })
     })
   }
