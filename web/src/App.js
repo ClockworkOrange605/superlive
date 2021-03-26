@@ -83,7 +83,38 @@ const MatchList = function ({matchList, selectMatchItem}) {
               <span className="MatchLegion">🏆&nbsp;{item.competition_name}</span>
               <span className="MatchRegion">🌍&nbsp;{item.region_name}</span>
             </p>
-            <p>{item.updates ? '+' : '-'}</p>
+            <hr />
+            <p>
+              { item.events !== undefined ? (
+                <div>
+                  <span>
+                    {(item.events.filter(item => item.type == 'throw-in').length / item.events.length * 100).toFixed(2)}%
+                    <img src={iconThrowIn} />
+                    {item.events.filter(item => item.type == 'throw-in').length}
+                  </span>
+                  <span>
+                    <img src={iconFreeKick} />
+                    {item.events.filter(item => item.type == 'free-kick').length}
+                  </span>
+                  <span>
+                    <img src={iconGoalKick} />
+                    {item.events.filter(item => item.type == 'goal-kick').length}
+                  </span>
+                  <span>
+                    <img src={iconCornerKick} />
+                    {item.events.filter(item => item.type == 'corner-kick').length}
+                  </span>
+                  <span>
+                    <img src={iconOffside} />
+                    {item.events.filter(item => item.type == 'offside').length}
+                  </span>
+                  <span>
+                    <img src={iconGoal} />
+                    {item.events.filter(item => item.type == 'goal').length}
+                  </span>
+                </div>
+              ) : '' }
+            </p>
           </li>
         })}
       </ul>

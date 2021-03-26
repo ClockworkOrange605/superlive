@@ -18,8 +18,8 @@ setInterval(function() {
 function processMatch(match) {
   console.warn('connect', match.id)
   watchMatch(match, (result) => {
-    if(result.status != 'finished') {
-      console.warn('reconnect', result.match.id)
+    if(result.status != 'finished' && result.status != 'abandoned') {
+      console.warn('reconnect', result.match.id, result.status)
       processMatch(result.match)
     } else {
       console.warn('saving', result.match.id)

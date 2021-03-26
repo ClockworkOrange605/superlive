@@ -33,7 +33,8 @@ app.get('/api/match/', (req, res) => {
           region_name: 1,
           competition_name: 1, 
           teams: 1,
-          scores: 1
+          scores: 1,
+          events: 1
         },
         sort: {start: -1},
         limit: 100,
