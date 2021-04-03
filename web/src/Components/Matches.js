@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import iconThrowIn from '../svg/throw-in.svg'
 import iconFreeKick from '../svg/free-kick.svg'
@@ -7,28 +7,113 @@ import iconCornerKick from '../svg/corner-kick.svg'
 import iconOffside from '../svg/offside.svg'
 import iconGoal from '../svg/goal.svg'
 
+import * as echarts from 'echarts';
+
 const Loader = () => <div className="Loader">⚽</div>
+
+const EventCounts = ({events}) => <p>
+  <span>
+    {(events.filter(item => item.type == 'throw-in').length / events.length * 100).toFixed(2)}%
+    <img src={iconThrowIn} />
+    {events.filter(item => item.type == 'throw-in').length}
+  </span>
+  <span>
+    <img src={iconFreeKick} />
+    {events.filter(item => item.type == 'free-kick').length}
+  </span>
+  <span>
+    <img src={iconGoalKick} />
+    {events.filter(item => item.type == 'goal-kick').length}
+  </span>
+  <span>
+    <img src={iconCornerKick} />
+    {events.filter(item => item.type == 'corner-kick').length}
+  </span>
+  <span>
+    <img src={iconOffside} />
+    {events.filter(item => item.type == 'offside').length}
+  </span>
+  <span>
+    <img src={iconGoal} />
+    {events.filter(item => item.type == 'goal').length}
+  </span>
+</p>
+
+const EventStats = ({events}) => {
+  let stats = {}
+  events.forEach((item, index, arr) => {
+    if(index >= 0 && index < arr.length - 1) {
+      // let key = arr[index-5].type+'->'+arr[index-4].type+'->'+arr[index-3].type+'->'+arr[index-2].type+'->'+arr[index-1].type+'->'+item.type
+      // let key = arr[index-4].type+'->'+arr[index-3].type+'->'+arr[index-2].type+'->'+arr[index-1].type+'->'+item.type
+      // let key = arr[index-3].type+'->'+arr[index-2].type+'->'+arr[index-1].type+'->'+item.type
+      // let key = arr[index-2].type+'->'+arr[index-1].type+'->'+item.type
+      // let key = arr[index-1].type+'->'+item.type
+      let key = item.type
+
+      if(stats[key] == undefined)
+        stats[key] = []
+
+      stats[key]
+        .push(arr[index+1])
+    }
+  })
+
+  return Object.keys(stats).sort().map((key) => <section>{key}<EventCounts events={stats[key]} /></section>)
+}
+
+const Chart = ({events}) => {
+  const chartRef = useRef(null)
+
+  console.log(events)
+
+  useEffect(() => {
+    /*/https://echarts.apache.org/examples/en/editor.html?c=bar-data-color/*/
+    echarts
+      .init(chartRef.current)
+      .setOption({
+        tooltip: {},
+        xAxis: { data: ['free-kick', 'goal-kick', 'corner-kick', 'offset', 'goal', 'throw-in']},
+        yAxis: {},
+        series: [{
+          name: 'Events',
+          type: 'bar',
+          data: [
+            {value: events.filter(item => item.type == 'free-kick').length, itemStyle: { color: '#a6ddff' }},
+            {value: events.filter(item => item.type == 'goal-kick').length, itemStyle: { color: '#85f2ef' }},
+            {value: events.filter(item => item.type == 'corner-kick').length, itemStyle: { color: '#feb2d5' }},
+            {value: events.filter(item => item.type == 'offset').length, itemStyle: { color: '#d6b2ff' }},
+            {value: events.filter(item => item.type == 'goal').length, itemStyle: { color: '#ffc6a6' }},
+            {value: events.filter(item => item.type == 'throw-in').length, itemStyle: { color: '#ffeb66' }}
+          ]
+        }]
+      })
+  }, [chartRef]);
+
+  return (
+    <div id="chart" ref={chartRef} style={ { width: '600px', height: '300px' } }/>
+  )
+}
 
 const Matches = () => {
   const [matchList, setMatchList] = useState(null)
-  
+
   useEffect(() => {
     fetch('/api/match/')
       .then((res) => res.json())
       .then((data) => setMatchList(data))
   }, [])
-  
+
   const [selectedItem, selectMatchItem] = useState(null)
   const [matchItem, setMatchItem] = useState(null)
-  
+
   useEffect(() => {
     setMatchItem(null)
-  
+
     fetch('/api/match/' + selectedItem)
       .then((res) => res.json())
       .then((data) => setMatchItem(data))
   }, [selectedItem])
-  
+
   return (
     <main className="Content">
       <aside style={{width: '50%', margin: 0}}>
@@ -45,8 +130,8 @@ const MatchList = ({matchList, selectMatchItem}) => {
   return (
     <div className="MatchList">
       <ul>
-        {!matchList ? <Loader /> : matchList.map((item, index) => {
-          return <li 
+        {!matchList ? <Loader /> : matchList.map((item) => {
+          return <li
             key={item.id} className={`MatchLink ${item.state}`}
             onClick={() => selectMatchItem(item.id)}
           >
@@ -71,39 +156,11 @@ const MatchList = ({matchList, selectMatchItem}) => {
               <span className="MatchRegion">🌍&nbsp;{item.region_name}</span>
             </p>
             <hr />
-            { item.events !== undefined ? (
-              <p>
-                <span>
-                  {(item.events.filter(item => item.type == 'throw-in').length / item.events.length * 100).toFixed(2)}%
-                  <img src={iconThrowIn} />
-                  {item.events.filter(item => item.type == 'throw-in').length}
-                </span>
-                <span>
-                  <img src={iconFreeKick} />
-                  {item.events.filter(item => item.type == 'free-kick').length}
-                </span>
-                <span>
-                  <img src={iconGoalKick} />
-                  {item.events.filter(item => item.type == 'goal-kick').length}
-                </span>
-                <span>
-                  <img src={iconCornerKick} />
-                  {item.events.filter(item => item.type == 'corner-kick').length}
-                </span>
-                <span>
-                  <img src={iconOffside} />
-                  {item.events.filter(item => item.type == 'offside').length}
-                </span>
-                <span>
-                  <img src={iconGoal} />
-                  {item.events.filter(item => item.type == 'goal').length}
-                </span>
-              </p>
-            ) : <p></p> }
+            { item.events !== undefined ? <EventCounts events={item.events} /> : <p></p> }
           </li>
         })}
       </ul>
-    </div>    
+    </div>
   )
 }
 
@@ -112,39 +169,15 @@ const MatchItem = ({matchItem}) => {
     <div className="MatchItem">
       <div>
         <h2>
-          { !matchItem ? <Loader /> : 
+          { !matchItem ? <Loader /> :
             `${matchItem.teams.home.name} ⚽ ${matchItem.teams.away.name}`
           }
         </h2>
         <div className="MatchInfo">
-          {matchItem && matchItem.events && (
-            <div>
-              <span>
-                <img src={iconThrowIn} />
-                <span>{Object.values(matchItem.events).filter(item => item.type == 'throw-in').length}</span>
-              </span>
-              <span>
-                <img src={iconFreeKick} />
-                {Object.values(matchItem.events).filter(item => item.type == 'free-kick').length}
-              </span>
-              <span>
-                <img src={iconGoalKick} />
-                {Object.values(matchItem.events).filter(item => item.type == 'goal-kick').length}
-              </span>
-              <span>
-                <img src={iconCornerKick} />
-                {Object.values(matchItem.events).filter(item => item.type == 'corner-kick').length}
-              </span>
-              <span>
-                <img src={iconOffside} />
-                {Object.values(matchItem.events).filter(item => item.type == 'offside').length}
-              </span>
-              <span>
-                <img src={iconGoal} />
-                {Object.values(matchItem.events).filter(item => item.type == 'goal').length}
-              </span>
-            </div>
-          )}
+          {matchItem && matchItem.events && <Chart events={matchItem.events} />}
+
+          {matchItem && matchItem.events && <EventCounts events={matchItem.events} />}
+          {matchItem && matchItem.events && <EventStats events={matchItem.events} />}
 
           {matchItem && matchItem.periods && (
             <div>
@@ -162,7 +195,7 @@ const MatchItem = ({matchItem}) => {
                 return <div key={index} className={`${item.type} ${item.side}`}>
                   {`${Math.trunc(item.match_time / 60)}:${(item.match_time % 60).toString().padStart(2, 0)}' `}
                   {!item.additional_time ? '' : `${Math.trunc(item.additional_time / 60)}:${(item.additional_time % 60).toString().padStart(2, 0)}' `}
-                  {item.name} 
+                  {item.name}
                 </div>
               })}
             </div>
