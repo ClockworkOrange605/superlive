@@ -1,46 +1,67 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-family: Roboto;
+  background-color: black;
+}
+
 .App {
-  text-align: center;
   display: grid;
+  background-color: black;
+  max-width: 1000px;
+  min-height: 100vh;
+  margin: 0 auto;
+  grid-template-rows: 50px 1fr 50px;
   overflow: hidden;
-  height: auto;
-  max-height: 100%;
-  grid-template-columns: minmax(300px, 10%), minmax(500px, 80%), minmax(300px, 10%);
-  grid-template-rows: minmax(100px, 10%), minmax(500px, 80%), minmax(200px, 10%);
 }
 
 .Header {
-  position: fixed;
-  width: 100%;
-  background-color: #ff600b;
-  grid-column: 1 / 4;
-  grid-row: 1;
-  min-height: 50px;
-  z-index: 999;
-  border-bottom-left-radius: 35%;
-  border-bottom-right-radius: 35%;
-  box-shadow: 0 10px 20px rgba(14, 8, 8, 0.19), 0 6px 6px rgba(0,0,0,0.23); 
+  display: flex;
+  background-color: #FF0025;    
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0px 0px 75px 75px;
+  padding: 0 50px;
+}
+
+.Header .Logo {
+  width: 32px;
+  height: 32px;
+}
+
+.Header nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex-basis: 430px;
+  padding: 0 10px;
+}
+
+.Header nav a {
+  font-size: 22px;
+  color: white;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 .Footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #00c713;
-  grid-column: 1 / 4;
-  grid-row: 3;
-  min-height: 50px;
-  border-top-left-radius: 35%;
-  border-top-right-radius: 35%;
-  box-shadow: 0 -10px 10px rgb(14 8 8 / 19%), 0 -6px 6px rgb(0 0 0 / 23%);
+  background-color: #F8E800;
+  border-radius: 75px 75px 0px 0px;
 }
 
 .Content {
-  display: flex;
-  padding: 55px 0;  
-  grid-column: 1 / 4;
-  grid-row: 2;
+  display: grid;
   background-color: black;
-  color: white;
+  /*grid-template: 100vh / repeat(2, 1fr);*/
+  grid-template-columns: repeat(2, 1fr);
+  /*grid-template-rows: 1fr;*/
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 @media (prefers-reduced-motion: no-preference) {
