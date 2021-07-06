@@ -65,9 +65,9 @@ html {
 @media (prefers-reduced-motion: no-preference) {
   .App .Loader {
     font-size: 68px;
-    width: 68px;
-    height: 68px;
     animation: Loader-spin infinite 5s linear;
+    text-align: center;
+    margin: 15px;
   }
 }
 

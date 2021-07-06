@@ -167,13 +167,9 @@ const MatchList = ({matchList, selectMatchItem}) => {
 const MatchItem = ({matchItem}) => {
   return (
     <div className="MatchItem">
-      <div>
-        <h2>
-          { !matchItem ? <Loader /> :
-            `${matchItem.teams.home.name} ⚽ ${matchItem.teams.away.name}`
-          }
-        </h2>
+      { !matchItem ? <Loader /> : (
         <div className="MatchInfo">
+          <h2>{`${matchItem.teams.home.name} ⚽ ${matchItem.teams.away.name}`}</h2>
           {matchItem && matchItem.events && <Chart events={matchItem.events} />}
 
           {matchItem && matchItem.events && <EventCounts events={matchItem.events} />}
@@ -201,7 +197,7 @@ const MatchItem = ({matchItem}) => {
             </div>
           )}
         </div>
-      </div>
+      )}
     </div>
   )
 }

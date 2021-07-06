@@ -21,6 +21,9 @@ function App() {
 
         <Route exact path="/" component={Dashboard} />
         <Route path="/matches/" component={Matches} />
+        <Route path="/betting/">
+          <div className="Betting" />
+        </Route>
 
         <footer className="Footer" />
       </Router>
