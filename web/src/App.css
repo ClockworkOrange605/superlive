@@ -13,6 +13,7 @@ html {
 .App {
   display: grid;
   background-color: black;
+  color: white;
   max-width: 1000px;
   min-height: 100vh;
   margin: 0 auto;
@@ -57,16 +58,15 @@ html {
 .Content {
   display: grid;
   background-color: black;
-  /*grid-template: 100vh / repeat(2, 1fr);*/
   grid-template-columns: repeat(2, 1fr);
-  /*grid-template-rows: 1fr;*/
-  max-height: 80vh;
   overflow-y: auto;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App .Loader {
     font-size: 68px;
+    width: 68px;
+    height: 68px;
     animation: Loader-spin infinite 5s linear;
   }
 }
@@ -81,8 +81,8 @@ html {
 }
 
 .MatchList {
-  width: 600px;
-  height: 535px;
+  width: 100%;
+  height: 100%;
   overflow: overlay;
 }
 
@@ -105,7 +105,7 @@ html {
 }
 
 .MatchList .MatchLink:hover {
-  transform: scale(1.2);
+  transform: scale(1.05);
 }
 
 .MatchList .MatchLink > p {
@@ -132,7 +132,9 @@ html {
 }
 
 .MatchItem {
-  height: 535px;
+  /* height: 535px; */
+  width: 100%;
+  height: 100%;
   overflow: overlay;
 }
 

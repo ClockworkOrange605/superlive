@@ -116,10 +116,10 @@ const Matches = () => {
 
   return (
     <main className="Content">
-      <aside style={{width: '50%', margin: 0}}>
+      <aside>
         <MatchList matchList={matchList} selectMatchItem={selectMatchItem}/>
       </aside>
-      <aside style={{width: '50%', margin: 0}}>
+      <aside>
         <MatchItem matchItem={matchItem} />
       </aside>
     </main>
