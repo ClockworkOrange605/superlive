@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+    app:
+        image: node:10
+        working_dir: /code
+        command: sh -c "npm install && npm run build && npm run dev"
+        ports: 
+            - 3000:3000
+            - 3005:3005
+        volumes: 
+            - ./:/code
+        environment:
+            MONGO_URI: mongodb://mongo:27017
+    mongo:
+        image: mongo:4
+        ports: 
+            - 27017:27017
