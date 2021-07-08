@@ -1,8 +1,10 @@
-const config = require('./config/main.js')
-config.db.collection = 'matches_v2'
+import config from './config/main.js'
 
-const ApiClient = require('./src/client.js')
-const { MongoClient } = require("mongodb");
+import ApiClient from './src/client.js'
+
+import mongo from 'mongodb'
+const { MongoClient } = mongo
+
 
 setInterval(function() {
   getMatches({offset: 0, limit: 5}, (matches) => {

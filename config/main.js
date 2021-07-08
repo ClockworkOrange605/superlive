@@ -1,6 +1,11 @@
-require('dotenv').config()
+import fs from 'fs'
+import env from 'dotenv'
 
-module.exports = {
+const token = fs.readFileSync('./token.json').toString()
+
+env.config()
+
+export default {
     app: {
         port: process.env.PORT || 3005
     },
@@ -11,10 +16,11 @@ module.exports = {
             password: process.env.SUPERLIVE_PASSWORD ,
             fingerprint: process.env.SUPERLIVE_FINGERPRINT
         },
-        token: require('../token.json')
+        token: token
     },
     db: {
         url: process.env.MONGO_URI || 'mongodb://localhost:27017',
-        name: process.env.MONGO_COLLECTION || 'superlive'
+        name: process.env.MONGO_COLLECTION || 'superlive',
+        collection: 'matches_v2'
     }    
 }
