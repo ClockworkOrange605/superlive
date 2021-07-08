@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "author": "Ak",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "build": "cd web && npm install && npm run build",

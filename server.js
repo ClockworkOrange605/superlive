@@ -1,14 +1,14 @@
-const config = require('./config/main.js')
-config.db.collection = 'matches_v2'
-const path = require('path')
+import config from './config/main.js'
 
-const { MongoClient } = require("mongodb")
-const express = require('express')
+import express from 'express'
+import mongo from 'mongodb'
+import path from 'path'
 
-const app = express();
+const { MongoClient } = mongo
+const app = express()
 
 app.use(
-  express.static(path.resolve(__dirname, './web/build'))
+  express.static(path.resolve('./web/build'))
 )
 
 app.get('/api/status/', (req, res) => {
@@ -31,7 +31,7 @@ app.get('/api/match/', (req, res) => {
           start: 1,
           state: 1,
           region_name: 1,
-          competition_name: 1, 
+          competition_name: 1,
           teams: 1,
           scores: 1,
           events: 1
@@ -68,8 +68,8 @@ app.get('/api/match/:id/', (req, res) => {
 })
 
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, './web/build', 'index.html'));
-});
+  res.sendFile(path.resolve('./web/build', 'index.html'))
+})
 
 app.listen(config.app.port, () => {
   console.log(`App listening at http://localhost:${config.app.port}`)

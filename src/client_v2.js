@@ -1,8 +1,8 @@
-const atob = require('atob');
-const { v4: uuidv4 } = require('uuid');
+import WebSocket from 'ws'
+import EventEmitter from 'events'
 
-const EventEmitter = require('events');
-const WebSocket = require('ws');
+import atob from 'atob'
+import { v4 as uuidv4 } from 'uuid'
 
 class ApiClient {
 
@@ -161,4 +161,4 @@ function prepareRequest(type, payload) {
   })
 }
 
-module.exports = ApiClient
+export default ApiClient

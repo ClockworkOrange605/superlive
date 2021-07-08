@@ -1,15 +1,15 @@
-const config = require('../config/main.js').betboom
+import config from '../config/main.js'
 
-const atob = require('atob');
-const { v4: uuidv4 } = require('uuid');
+import WebSocket from 'ws'
+import EventEmitter from 'events'
 
-const WebSocket = require('ws');
-const EventEmitter = require('events');
+import atob from 'atob'
+import { v4 as uuidv4 } from 'uuid'
 
 class ApiClient {
 
     constructor(callback) {
-        this.socket = new WebSocket(config.url)
+        this.socket = new WebSocket(config.betboom.url)
         this.emmiter = new EventEmitter()
 
         const self = this
@@ -82,7 +82,7 @@ class ApiClient {
     }
 
     auth(callback) {
-        let payload = JSON.parse(atob(config.token))
+        let payload = JSON.parse(atob(config.betboom.token))
         let request = prepareRequest('auth', payload)
 
         this.socket.send(request)
@@ -145,4 +145,4 @@ function prepareRequest(type, payload) {
     })
 }
 
-module.exports = ApiClient
+export default ApiClient

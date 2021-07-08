@@ -1,6 +1,6 @@
-const config = require('./config/main.js')
+import config from './config/main.js'
 
-const ApiClient = require('./src/client_v2.js')
+import ApiClient from './src/client_v2.js'
 
 setInterval(function() {
   getMatches({offset: 0, limit: 5}, (matches) => {

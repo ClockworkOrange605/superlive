@@ -1,12 +1,12 @@
-const config = require('./config/main').betboom.auth
+import config from './config/main.js'
 
-const fs = require('fs')
-const axios = require('axios')
+import axios from 'axios'
+import fs from 'fs'
 
 const params = new URLSearchParams()
-params.append('phone', config.login)
-params.append('password', config.password)
-params.append('fingerprint', config.fingerprint)
+params.append('phone', config.betboom.auth.login)
+params.append('password', config.betboom.auth.password)
+params.append('fingerprint', config.betboom.auth.fingerprint)
 
 axios
     .post('https://betboom.ru/auth/login', params, {
@@ -21,8 +21,8 @@ axios
             .then((result) => {
                 let token = result.data.match(/[=][A-Za-z0-9]+[=]/)[0].slice(1)
 
-                fs.writeFile('./token.json', '"' + token + '"', (error) => {
-                    console.error(error)
+                fs.writeFile('./token.json', token, (err) => {
+                    if(err) console.error('ERROR', error)
                 })
 
                 console.log('TOKEN', token)
