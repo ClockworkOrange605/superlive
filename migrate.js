@@ -1,7 +1,7 @@
-const config = require('./config/main.js')
-config.db.collection = 'matches_v2'
+import config from './config/main.js'
 
-const { MongoClient } = require("mongodb");
+import mongo from 'mongodb'
+const { MongoClient } = mongo
 
 getMatches({limit: 100, offset: 0}, (error, result) => {
   if(error !== null) throw error

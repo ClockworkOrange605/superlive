@@ -90,7 +90,7 @@ const Chart = ({events}) => {
   }, [chartRef]);
 
   return (
-    <div id="chart" ref={chartRef} style={ { width: '600px', height: '300px' } }/>
+    <div id="chart" ref={chartRef} style={ { minWidth: '300px', minHeight: '300px' } }/>
   )
 }
 
@@ -172,10 +172,10 @@ const MatchItem = ({matchItem}) => {
           <h2>{`${matchItem.teams.home.name} ⚽ ${matchItem.teams.away.name}`}</h2>
           {matchItem && matchItem.events && <Chart events={matchItem.events} />}
 
-          {matchItem && matchItem.events && <EventCounts events={matchItem.events} />}
-          {matchItem && matchItem.events && <EventStats events={matchItem.events} />}
+          {/* {matchItem && matchItem.events && <EventCounts events={matchItem.events} />} */}
+          {/* {matchItem && matchItem.events && <EventStats events={matchItem.events} />} */}
 
-          {matchItem && matchItem.periods && (
+          {/* {matchItem && matchItem.periods && (
             <div>
               {matchItem.periods.map((item, index) => {
                 return <div key={index}>
@@ -183,7 +183,7 @@ const MatchItem = ({matchItem}) => {
                 </div>
               })}
             </div>
-          )}
+          )} */}
 
           {matchItem && matchItem.events && (
             <div className="EventList">

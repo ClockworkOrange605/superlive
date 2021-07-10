@@ -143,9 +143,8 @@ html {
   margin: 10px;
 }
 
-.MatchItem .EventList {
-  /* margin: auto; */
-  width: 550px;
+.MatchItem .MatchInfo h2 {
+  text-align: center;
 }
 
 .MatchItem .EventList .home { text-align: left; }
